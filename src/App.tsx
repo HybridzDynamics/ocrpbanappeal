@@ -91,9 +91,6 @@ function App() {
         {activeTab === 'status' && (
           <AppealStatus appeals={appeals} />
         )}
-        {activeTab === 'admin' && isAdmin && (
-          <AdminPanel appeals={appeals} onStatusUpdate={handleStatusUpdate} />
-        )}
       </main>
     </div>
   );

@@ -239,13 +239,13 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Steam ID64 *
+                    Discord User ID *
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      value={formData.steamId}
-                      onChange={(e) => handleInputChange('steamId', e.target.value)}
+                      value={formData.discordUserId}
+                      onChange={(e) => handleInputChange('discordUserId', e.target.value)}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
                         errors.steamId ? 'border-red-300 bg-red-50' : 'border-slate-300'
                       }`}
@@ -257,7 +257,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                     <p className="text-red-600 text-sm mt-1">{errors.steamId}</p>
                   )}
                   <p className="text-slate-500 text-sm mt-1">
-                    Don't know your Steam ID? Click the link icon to find it
+                    Discord user id
                   </p>
                 </div>
               </div>

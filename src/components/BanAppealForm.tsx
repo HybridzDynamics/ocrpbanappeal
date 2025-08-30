@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { AppealData } from '../types/Appeal';
-import { Send, AlertCircle, CheckCircle, User, Calendar, MessageSquare, FileText, ExternalLink } from 'lucide-react';
+import { Send, AlertCircle, CheckCircle, User, Calendar, MessageSquare } from 'lucide-react';
 
 interface BanAppealFormProps {
-  onSubmit: (data: AppealData) => void;
+  onSubmit: (data: Omit<AppealData, 'id' | 'submittedAt' | 'status'>) => void;
 }
 
 const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<Omit<AppealData, 'id' | 'submittedAt' | 'status'>>({
     playerName: '',
     discordTag: '',
-    steamId: '',
     banDate: '',
     banReason: '',
     appealReason: '',
@@ -24,37 +23,20 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.playerName.trim()) {
-      newErrors.playerName = 'Player name is required';
-    }
-
+    if (!formData.playerName.trim()) newErrors.playerName = 'Player name is required';
     if (!formData.discordTag.trim()) {
       newErrors.discordTag = 'Discord tag is required';
     } else if (!formData.discordTag.includes('#') && !formData.discordTag.includes('@')) {
       newErrors.discordTag = 'Please provide a valid Discord tag (e.g., username#1234 or @username)';
     }
-
-    if (!formData.steamId.trim()) {
-      newErrors.steamId = 'Steam ID is required';
-    }
-
-    if (!formData.banDate) {
-      newErrors.banDate = 'Ban date is required';
-    }
-
-    if (!formData.banReason.trim()) {
-      newErrors.banReason = 'Ban reason is required';
-    }
-
+    if (!formData.banDate) newErrors.banDate = 'Ban date is required';
+    if (!formData.banReason.trim()) newErrors.banReason = 'Ban reason is required';
     if (!formData.appealReason.trim()) {
       newErrors.appealReason = 'Appeal reason is required';
     } else if (formData.appealReason.length < 50) {
       newErrors.appealReason = 'Appeal reason must be at least 50 characters';
     }
-
-    if (!formData.acknowledgment) {
-      newErrors.acknowledgment = 'You must acknowledge the terms';
-    }
+    if (!formData.acknowledgment) newErrors.acknowledgment = 'You must acknowledge the terms';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -62,9 +44,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      submitToDiscord();
-    }
+    if (validateForm()) submitToDiscord();
   };
 
   const submitToDiscord = async () => {
@@ -73,11 +53,11 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
       
       const embed = {
         title: "🚨 New Ban Appeal Submitted",
-        color: 0x1e40af, // Blue color
+        color: 0x1e40af,
         fields: [
           {
             name: "👤 Player Information",
-            value: `**Name:** ${formData.playerName}\n**Discord:** ${formData.discordTag}\n**Steam ID:** ${formData.steamId}`,
+            value: `**Name:** ${formData.playerName}\n**Discord:** ${formData.discordTag}`,
             inline: false
           },
           {
@@ -94,9 +74,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
           }
         ],
         timestamp: new Date().toISOString(),
-        footer: {
-          text: "Orlando City RP Ban Appeal System"
-        }
+        footer: { text: "Orlando City RP Ban Appeal System" }
       };
 
       if (formData.additionalInfo) {
@@ -109,16 +87,11 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
         });
       }
 
-      const payload = {
-        content: `@here New ban appeal from **${formData.playerName}**`,
-        embeds: [embed]
-      };
+      const payload = { content: `@here New ban appeal from **${formData.playerName}**`, embeds: [embed] };
 
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
@@ -136,9 +109,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
 
   const handleInputChange = (field: keyof typeof formData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
   if (isSubmitted) {
@@ -150,8 +121,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Appeal Submitted Successfully</h2>
           <p className="text-slate-600 mb-6">
-            Your ban appeal has been submitted and is now under review. You will receive an update
-            via Discord within 24-48 hours.
+            Your ban appeal has been submitted and is now under review. You will receive an update via Discord within 24-48 hours.
           </p>
           <div className="bg-blue-50 rounded-lg p-4 mb-6">
             <p className="text-blue-800 font-medium">Appeal ID: #{Date.now()}</p>
@@ -209,14 +179,10 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                     type="text"
                     value={formData.playerName}
                     onChange={(e) => handleInputChange('playerName', e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                      errors.playerName ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${errors.playerName ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                     placeholder="e.g., John_Smith"
                   />
-                  {errors.playerName && (
-                    <p className="text-red-600 text-sm mt-1">{errors.playerName}</p>
-                  )}
+                  {errors.playerName && <p className="text-red-600 text-sm mt-1">{errors.playerName}</p>}
                 </div>
 
                 <div>
@@ -227,38 +193,10 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                     type="text"
                     value={formData.discordTag}
                     onChange={(e) => handleInputChange('discordTag', e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                      errors.discordTag ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${errors.discordTag ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                     placeholder="e.g., username#1234 or @username"
                   />
-                  {errors.discordTag && (
-                    <p className="text-red-600 text-sm mt-1">{errors.discordTag}</p>
-                  )}
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Discord User ID *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formData.discordUserId}
-                      onChange={(e) => handleInputChange('discordUserId', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                        errors.steamId ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                      }`}
-                      placeholder="e.g., 76561198000000000"
-                    />
-                    
-                  </div>
-                  {errors.steamId && (
-                    <p className="text-red-600 text-sm mt-1">{errors.steamId}</p>
-                  )}
-                  <p className="text-slate-500 text-sm mt-1">
-                    Discord user id
-                  </p>
+                  {errors.discordTag && <p className="text-red-600 text-sm mt-1">{errors.discordTag}</p>}
                 </div>
               </div>
             </div>
@@ -279,13 +217,9 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                     type="date"
                     value={formData.banDate}
                     onChange={(e) => handleInputChange('banDate', e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                      errors.banDate ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${errors.banDate ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                   />
-                  {errors.banDate && (
-                    <p className="text-red-600 text-sm mt-1">{errors.banDate}</p>
-                  )}
+                  {errors.banDate && <p className="text-red-600 text-sm mt-1">{errors.banDate}</p>}
                 </div>
 
                 <div className="md:col-span-2">
@@ -296,14 +230,10 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                     value={formData.banReason}
                     onChange={(e) => handleInputChange('banReason', e.target.value)}
                     rows={3}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none ${
-                      errors.banReason ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none ${errors.banReason ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                     placeholder="Copy the exact ban reason provided by staff..."
                   />
-                  {errors.banReason && (
-                    <p className="text-red-600 text-sm mt-1">{errors.banReason}</p>
-                  )}
+                  {errors.banReason && <p className="text-red-600 text-sm mt-1">{errors.banReason}</p>}
                 </div>
               </div>
             </div>
@@ -323,27 +253,19 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                   value={formData.appealReason}
                   onChange={(e) => handleInputChange('appealReason', e.target.value)}
                   rows={6}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none ${
-                    errors.appealReason ? 'border-red-300 bg-red-50' : 'border-slate-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none ${errors.appealReason ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                   placeholder="Explain your side of the story, acknowledge any mistakes, and explain why you deserve another chance..."
                 />
                 <div className="flex justify-between items-center mt-2">
-                  <span className={`text-sm ${
-                    formData.appealReason.length < 50 ? 'text-red-500' : 'text-slate-500'
-                  }`}>
+                  <span className={`text-sm ${formData.appealReason.length < 50 ? 'text-red-500' : 'text-slate-500'}`}>
                     {formData.appealReason.length}/50 minimum characters
                   </span>
-                  {errors.appealReason && (
-                    <p className="text-red-600 text-sm">{errors.appealReason}</p>
-                  )}
+                  {errors.appealReason && <p className="text-red-600 text-sm">{errors.appealReason}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Additional Information
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Additional Information</label>
                 <textarea
                   value={formData.additionalInfo}
                   onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
@@ -351,9 +273,7 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none"
                   placeholder="Any additional context, evidence, or information that might help your appeal..."
                 />
-                <p className="text-slate-500 text-sm mt-1">
-                  Include any relevant screenshots, video links, or witness information
-                </p>
+                <p className="text-slate-500 text-sm mt-1">Include any relevant screenshots, video links, or witness information</p>
               </div>
             </div>
 
@@ -370,19 +290,12 @@ const BanAppealForm: React.FC<BanAppealFormProps> = ({ onSubmit }) => {
                 <div className="flex-1">
                   <label htmlFor="acknowledgment" className="text-sm text-slate-700 leading-relaxed">
                     I acknowledge that I have read and understand the 
-                    <a href="#" className="text-blue-600 hover:text-blue-800 mx-1 underline">
-                      Orlando City RP Rules
-                    </a>
+                    <a href="#" className="text-blue-600 hover:text-blue-800 mx-1 underline">Orlando City RP Rules</a>
                     and 
-                    <a href="#" className="text-blue-600 hover:text-blue-800 mx-1 underline">
-                      Appeal Policy
-                    </a>. 
-                    I understand that providing false information or submitting frivolous appeals 
-                    may result in my appeal being denied and potential further penalties.
+                    <a href="#" className="text-blue-600 hover:text-blue-800 mx-1 underline">Appeal Policy</a>. 
+                    I understand that providing false information or submitting frivolous appeals may result in my appeal being denied and potential further penalties.
                   </label>
-                  {errors.acknowledgment && (
-                    <p className="text-red-600 text-sm mt-1">{errors.acknowledgment}</p>
-                  )}
+                  {errors.acknowledgment && <p className="text-red-600 text-sm mt-1">{errors.acknowledgment}</p>}
                 </div>
               </div>
             </div>

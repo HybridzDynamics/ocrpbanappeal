@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppealData } from '../types/Appeal';
-import { Search, Clock, CheckCircle, XCircle, Calendar, User, MessageSquare } from 'lucide-react';
+import { Search, Clock, CheckCircle, XCircle, User, MessageSquare } from 'lucide-react';
 
 interface AppealStatusProps {
   appeals: AppealData[];
@@ -101,17 +101,12 @@ const AppealStatus: React.FC<AppealStatusProps> = ({ appeals }) => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-slate-600">Discord: <span className="text-slate-900 font-medium">{appeal.discordTag}</span></p>
-                      <p className="text-slate-600">Steam ID: <span className="text-slate-900 font-medium">{appeal.steamId}</span></p>
-                    </div>
-                    <div>
-                      <p className="text-slate-600">Submitted: <span className="text-slate-900 font-medium">{formatDate(appeal.submittedAt || '')}</span></p>
-                      {appeal.reviewedAt && (
-                        <p className="text-slate-600">Reviewed: <span className="text-slate-900 font-medium">{formatDate(appeal.reviewedAt)}</span></p>
-                      )}
-                    </div>
+                  <div className="text-sm text-slate-600">
+                    <p>Discord: <span className="text-slate-900 font-medium">{appeal.discordTag}</span></p>
+                    <p>Submitted: <span className="text-slate-900 font-medium">{formatDate(appeal.submittedAt || '')}</span></p>
+                    {appeal.reviewedAt && (
+                      <p>Reviewed: <span className="text-slate-900 font-medium">{formatDate(appeal.reviewedAt)}</span></p>
+                    )}
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-slate-200">
